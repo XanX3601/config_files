@@ -75,6 +75,9 @@ Plug 'google/vim-maktaba'
 Plug 'google/vim-codefmt'
 Plug 'google/vim-glaive'
 
+" rainbow parenthesis
+Plug 'luochen1990/rainbow'
+
 call plug#end()
 
 filetype plugin indent on
@@ -449,3 +452,6 @@ function! s:check_back_space() abort
 endfunction
 
 let g:coc_snippet_next = '<tab>'
+
+" rainbow
+let g:rainbow_active = 1 
