@@ -78,6 +78,12 @@ Plug 'google/vim-glaive'
 " rainbow parenthesis
 Plug 'luochen1990/rainbow'
 
+" vim-doge
+Plug 'kkoomen/vim-doge', { 'do': { -> doge#install() } }
+
+" theme embark
+Plug 'embark-theme/vim', { 'as': 'embark' }
+
 call plug#end()
 
 filetype plugin indent on
@@ -127,7 +133,8 @@ set ruler
 set number
 
 let no_buffers_menu=1
-silent! colorscheme gruvbox
+silent! colorscheme embark
+set termguicolors
 
 " Disable the blinking cursor.
 set gcr=a:blinkon0
@@ -181,7 +188,7 @@ let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#branch#enabled = 1
 let g:airline#extensions#ale#enabled = 1
 let g:airline_skip_empty_sections = 1
-let g:airline_theme='luna'
+let g:airline_theme='embark'
 
 " indentline
 " disable overwrite of colors
