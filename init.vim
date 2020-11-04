@@ -273,7 +273,7 @@ let t:is_transparent = 0
 
 function! Toggle_transparent_background()
     if t:is_transparent == 1
-        hi Normal guibg=#111111 ctermbg=black
+        hi Normal guibg=#1E1C31 ctermbg=black
         let t:is_transparent = 0
     else
         hi Normal guibg=NONE ctermbg=NONE
