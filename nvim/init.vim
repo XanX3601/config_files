@@ -58,7 +58,6 @@ function! s:check_back_space() abort
   return !col || getline('.')[col - 1]  =~# '\s'
 endfunction
 " vifm
-let g:vifm_embed_split=1
 
 "Transparency
 let t:is_transparent = 0
