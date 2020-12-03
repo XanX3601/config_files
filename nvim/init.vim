@@ -18,6 +18,10 @@ call plug#begin(stdpath('data') . '/plugged')
     Plug 'google/vim-codefmt'
     " Coc
     Plug 'neoclide/coc.nvim', {'branch': 'release'}
+    " vifm
+    Plug 'vifm/vifm.vim'
+    " vim-buftabline
+    Plug 'ap/vim-buftabline'
 call plug#end()
 
 "Plugins options
@@ -53,6 +57,8 @@ function! s:check_back_space() abort
   let col = col('.') - 1
   return !col || getline('.')[col - 1]  =~# '\s'
 endfunction
+" vifm
+let g:vifm_embed_split=1
 
 "Transparency
 let t:is_transparent = 0
@@ -128,6 +134,9 @@ set statusline+=\ [%n] " buffer number
 
 "Key bindings
 let mapleader="," " map leader to comma
+" open split
+nnoremap <leader>v :vsplit<CR>
+nnoremap <leader>h :split<CR>
 " resize windows with arrow keys
 nnoremap <Up> :resize +2<CR>
 nnoremap <Down> :resize -2<CR>
@@ -144,6 +153,7 @@ nnoremap <leader>l :bn<CR>
 nnoremap <leader>x :BD<CR>
 " spell check
 nnoremap <leader>sf :set spelllang=fr<CR>
+nnoremap <leader>se :set spelllang=en_us<CR>
 nnoremap <leader>st :set spell!<CR>
 " fzf
 nnoremap <leader>ff :Files .<CR> 
