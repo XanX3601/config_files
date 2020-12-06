@@ -174,4 +174,7 @@ inoremap <silent><expr> <c-space> coc#refresh()
 " format on enter
 inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
                               \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+" vifm
+nnoremap <leader>o :Vifm<CR>
+                              \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
 let g:coc_snippet_next = '<tab>'
