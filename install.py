@@ -3,6 +3,11 @@ import git
 import pathlib
 import subprocess
 
+home_path = pathlib.Path.home()
+local_path = home_path.joinpath('local')
+bashrc_path = home_path.joinpath('.bashrc')
+bashrc_config_path = 
+
 
 @click.group()
 def install():
@@ -10,33 +15,29 @@ def install():
 
 
 @install.command()
-def nvim():
-    home_directory = pathlib.Path.home()
-    nvim_repo_path = home_directory.joinpath('neovim')
+def neovim():
+    # clone repository
+    nvim_repo_path = home_path.joinpath('neovim')
 
     if nvim_repo_path.exists():
         try:
-            nvim_repo = git.Repo(nvim_repo_path)
+            git.Repo(nvim_repo_path)
         except:
-            click.secho('{} already exists and can not be opened'.format(
-                nvim_repo_path),
-                        fg='red',
-                        err=True)
+            exit(1)
     else:
-        nvim_repo = git.Repo.clone_from('https://github.com/neovim/neovim.git',
-                                        nvim_repo_path)
+        git.Repo.clone_from('https://github.com/neovim/neovim.git',
+                            nvim_repo_path)
 
-    nvim_repo_build_path = nvim_repo_path.joinpath('build')
+    # make and install from local repository
+    nvim_install_path = local_path.joinpath('nvim')
 
-    if not nvim_repo_build_path.exists():
-        nvim_repo_build_path.mkdir()
+    args = ['make', 'CMAKE_INSTALL_PREFIX={}'.format(nvim_install_path)]
+    subprocess.run(args, cwd=nvim_repo_path)
 
-    args = [
-        'cmake', '-S',
-        str(nvim_repo_path), '-B',
-        str(nvim_repo_build_path)
-    ]
-    subprocess.run(args)
+    args = ['make', 'install']
+    subprocess.run(args, cwd=nvim_repo_path)
+
+    # add config to bashrc
 
 
 @install.command()
