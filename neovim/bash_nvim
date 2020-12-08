@@ -1,0 +1,3 @@
+NEOVIM_HOME="$HOME/local/neovim"
+
+export PATH=$NEOVIM_HOME/bin:$PATH

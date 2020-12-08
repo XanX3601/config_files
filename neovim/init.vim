@@ -77,7 +77,7 @@ set encoding=UTF-8 " encoding file to utf8
 filetype plugin indent on " Enable detection, plugin and indent
 syntax enable " enable syntax highlighting
 set autoread " auto re-read files that have been changed outside nvim
-set spell spelllang=en_us " spell check as English
+set spelllang=en_us " spell check as English
 set hidden " hide file buffers when opening new files instead of closing them
 set nowrap " no wrap line, just one long big line
 " menu for command line completion
@@ -154,6 +154,8 @@ nnoremap <leader>x :BD<CR>
 nnoremap <leader>sf :set spelllang=fr<CR>
 nnoremap <leader>se :set spelllang=en_us<CR>
 nnoremap <leader>st :set spell!<CR>
+" search
+nnoremap <leader><space> :noh<CR>
 " fzf
 nnoremap <leader>ff :Files .<CR> 
 nnoremap <leader>fl :Lines<CR>
@@ -174,7 +176,6 @@ inoremap <silent><expr> <c-space> coc#refresh()
 " format on enter
 inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
                               \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+let g:coc_snippet_next = '<tab>'
 " vifm
 nnoremap <leader>o :Vifm<CR>
-                              \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
-let g:coc_snippet_next = '<tab>'
