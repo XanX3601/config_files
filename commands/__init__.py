@@ -11,3 +11,4 @@ from .utils import (
     repository_path,
     create_utils_dirs,
 )
+from .vifm import vifm

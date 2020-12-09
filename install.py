@@ -1,6 +1,6 @@
 import click
 
-from commands import neovim, create_utils_dirs
+from commands import neovim, create_utils_dirs, vifm
 
 
 @click.group()
@@ -11,4 +11,5 @@ def cli():
 if __name__ == "__main__":
     create_utils_dirs()
     cli.add_command(neovim)
+    cli.add_command(vifm)
     cli()
