@@ -115,7 +115,7 @@ def install():
 
         if result.returncode != 0:
             console.print(
-                "Error while configuring automake", justify="center", style="bold red"
+                "Error while configuring autoconf", justify="center", style="bold red"
             )
             console.rule("stdout")
             console.print(result.stdout)
@@ -182,7 +182,7 @@ def install():
 
     if not bash_line_found:
         with open(bashrc_path, "a") as bashrc:
-            bashrc.write("\n# automake config\n")
+            bashrc.write("\n# autoconf config\n")
             bashrc.write("{}\n".format(autoconf_bashrc_line))
 
     console.print("[bold green]Done![/]")
