@@ -168,7 +168,7 @@ def install():
     console.print("Compiling and installing automake...[bold green]Done![/]")
 
     # install bashrc config
-    console.print("Installing libtool bash config...", end="")
+    console.print("Installing automake bash config...", end="")
 
     shutil.copy(automake_bashrc_config_path, bashrc_config_path)
 
