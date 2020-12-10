@@ -1,0 +1,3 @@
+AUTOCONF_HOME="$HOME/local/libtool"
+
+export PATH=$AUTOCONF_HOME/bin:$PATH

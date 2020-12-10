@@ -15,26 +15,26 @@ from .utils import (
     console,
 )
 
-automake_archive_link = "https://ftp.gnu.org/gnu/automake/automake-1.16.3.tar.gz"
-automake_archive_top_directory_name = "automake-1.16.3"
-automake_archive_path = temp_path.joinpath("automake.tar.gz")
-automake_package_path = package_path.joinpath("automake")
-automake_install_path = local_path.joinpath("automake")
-automake_bashrc_config_path = current_path.joinpath("automake/bash_automake")
-automake_bashrc_line = "source {}/{}".format(
-    bashrc_config_path, automake_bashrc_config_path.name
+autoconf_archive_link = "https://ftp.gnu.org/gnu/autoconf/autoconf-2.70.tar.gz"
+autoconf_archive_top_directory_name = "autoconf-2.70"
+autoconf_archive_path = temp_path.joinpath("autoconf.tar.gz")
+autoconf_package_path = package_path.joinpath("autoconf")
+autoconf_install_path = local_path.joinpath("autoconf")
+autoconf_bashrc_config_path = current_path.joinpath("autoconf/bash_autoconf")
+autoconf_bashrc_line = "source {}/{}".format(
+    bashrc_config_path, autoconf_bashrc_config_path.name
 )
 
 
 @click.group()
-def automake():
-    """automake commands group."""
+def autoconf():
+    """autoconf commands group."""
     pass
 
 
-@automake.command()
+@autoconf.command()
 def install():
-    """install automake locally."""
+    """install autoconf locally."""
     # clone archive
     with Progress(
         "[progress.dexcription]{task.description}",
@@ -42,11 +42,11 @@ def install():
         console=console,
         transient=True,
     ) as progress:
-        with open(automake_archive_path, "wb") as archive:
-            task = progress.add_task("Downloading automake archive...", start=False)
+        with open(autoconf_archive_path, "wb") as archive:
+            task = progress.add_task("Downloading autoconf archive...", start=False)
 
             response = requests.get(
-                automake_archive_link,
+                autoconf_archive_link,
                 stream=True,
                 headers={"Accept-Encoding": ""},
             )
@@ -59,7 +59,7 @@ def install():
                 archive.write(data)
                 progress.advance(task_id=task, advance=len(data))
 
-    console.print("Downloading automake archive...[bold green]Done![/]")
+    console.print("Downloading autoconf archive...[bold green]Done![/]")
 
     # extract archive
     with Progress(
@@ -68,18 +68,18 @@ def install():
         console=console,
         transient=True,
     ) as progress:
-        progress.add_task("Extracting automake archive...", start=False)
+        progress.add_task("Extracting autoconf archive...", start=False)
 
-        automake_tmp_path = temp_path.joinpath(automake_archive_top_directory_name)
-        if automake_tmp_path.exists():
-            console.print("    Erasing {} directory...".format(automake_tmp_path))
-            shutil.rmtree(automake_tmp_path)
+        autoconf_tmp_path = temp_path.joinpath(autoconf_archive_top_directory_name)
+        if autoconf_tmp_path.exists():
+            console.print("    Erasing {} directory...".format(autoconf_tmp_path))
+            shutil.rmtree(autoconf_tmp_path)
 
-        with tarfile.open(automake_archive_path) as archive:
+        with tarfile.open(autoconf_archive_path) as archive:
             console.print("    Extracting archive...")
             archive.extractall(temp_path)
 
-    console.print("Extracing automake archive...[bold green]Done![/]")
+    console.print("Extracing autoconf archive...[bold green]Done![/]")
 
     # move temp directory to repo
     with Progress(
@@ -90,12 +90,12 @@ def install():
     ) as progress:
         progress.add_task("Moving archive content to package...", start=False)
 
-        if automake_package_path.exists():
+        if autoconf_package_path.exists():
             console.print("    Erasing previous package...")
-            shutil.rmtree(automake_package_path)
+            shutil.rmtree(autoconf_package_path)
 
         console.print("    Moving archive content...")
-        shutil.move(str(automake_tmp_path), str(automake_package_path))
+        shutil.move(str(autoconf_tmp_path), str(autoconf_package_path))
 
     console.print("Moving archive content to package...[bold green]Done![/]")
 
@@ -106,11 +106,11 @@ def install():
         console=console,
         transient=True,
     ) as progress:
-        progress.add_task("Configuring automake...", start=False)
+        progress.add_task("Configuring autoconf...", start=False)
 
-        args = ["./configure", "--prefix={}".format(automake_install_path)]
+        args = ["./configure", "--prefix={}".format(autoconf_install_path)]
         result = subprocess.run(
-            args, cwd=automake_package_path, capture_output=True, text=True
+            args, cwd=autoconf_package_path, capture_output=True, text=True
         )
 
         if result.returncode != 0:
@@ -123,7 +123,7 @@ def install():
             console.print(result.stderr)
             exit(1)
 
-    console.print("Configuring automake...[bold green]Done![/]")
+    console.print("Configuring autoconf...[bold green]Done![/]")
 
     # make
     with Progress(
@@ -132,16 +132,16 @@ def install():
         console=console,
         transient=True,
     ) as progress:
-        progress.add_task("Compiling and installing automake...", start=False)
+        progress.add_task("Compiling and installing autoconf...", start=False)
 
         args = ["make"]
         result = subprocess.run(
-            args, cwd=automake_package_path, capture_output=True, text=True
+            args, cwd=autoconf_package_path, capture_output=True, text=True
         )
 
         if result.returncode != 0:
             console.print(
-                "Error while compiling automake", justify="center", style="bold red"
+                "Error while compiling autoconf", justify="center", style="bold red"
             )
             console.rule("stdout")
             console.print(result.stdout)
@@ -152,12 +152,12 @@ def install():
         # make install
         args = ["make", "install"]
         result = subprocess.run(
-            args, cwd=automake_package_path, capture_output=True, text=True
+            args, cwd=autoconf_package_path, capture_output=True, text=True
         )
 
         if result.returncode != 0:
             console.print(
-                "Error while insalling automake", justify="center", style="bold red"
+                "Error while insalling autoconf", justify="center", style="bold red"
             )
             console.rule("stdout")
             console.print(result.stdout)
@@ -165,24 +165,24 @@ def install():
             console.print(result.stderr)
             exit(1)
 
-    console.print("Compiling and installing automake...[bold green]Done![/]")
+    console.print("Compiling and installing autoconf...[bold green]Done![/]")
 
     # install bashrc config
-    console.print("Installing libtool bash config...", end="")
+    console.print("Installing autoconf bash config...", end="")
 
-    shutil.copy(automake_bashrc_config_path, bashrc_config_path)
+    shutil.copy(autoconf_bashrc_config_path, bashrc_config_path)
 
     bash_line_found = False
 
     with open(bashrc_path, "r") as bashrc:
         for line in bashrc:
             line = line.strip()
-            if line == automake_bashrc_line:
+            if line == autoconf_bashrc_line:
                 bash_line_found = True
 
     if not bash_line_found:
         with open(bashrc_path, "a") as bashrc:
             bashrc.write("\n# automake config\n")
-            bashrc.write("{}\n".format(automake_bashrc_line))
+            bashrc.write("{}\n".format(autoconf_bashrc_line))
 
     console.print("[bold green]Done![/]")
