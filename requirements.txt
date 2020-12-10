@@ -2,3 +2,4 @@ click
 gitpython
 cmake
 rich
+requests

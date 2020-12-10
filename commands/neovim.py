@@ -21,6 +21,11 @@ nvim_repo_path = repository_path.joinpath("neovim")
 nvim_install_path = local_path.joinpath("neovim")
 nvim_build_path = nvim_repo_path.joinpath("build")
 nvim_bashrc_config_path = current_path.joinpath("neovim/bash_nvim")
+nvim_bashrc_line = "source {}/{}".format(
+    bashrc_config_path, nvim_bashrc_config_path.name
+)
+nvim_init_path = current_path.joinpath("neovim/init.vim")
+nvim_config_path = config_path.joinpath("nvim")
 
 
 @click.group()
@@ -122,41 +127,31 @@ def install():
     # install bash config
     console.print("Installing neovim bash config...", end="")
 
-    if not bashrc_config_path.exists():
-        os.mkdir(bashrc_config_path)
-
     shutil.copy(nvim_bashrc_config_path, bashrc_config_path)
 
-    bashrc_nvim_line = "source {}/{}/bash_nvim".format(
-        config_bash_path, bashrc_config_path.name
-    )
     bash_nvim_line_found = False
 
     with open(bashrc_path, "r") as bashrc:
         for line in bashrc:
             line = line.strip()
-            if line == bashrc_nvim_line:
+            if line == nvim_bashrc_line:
                 bash_nvim_line_found = True
 
     if not bash_nvim_line_found:
         with open(bashrc_path, "a") as bashrc:
             bashrc.write("\n# nvim config\n")
-            bashrc.write("{}\n".format(bashrc_nvim_line))
+            bashrc.write("{}\n".format(nvim_bashrc_line))
 
     console.print("[bold green]Done[/]")
 
     # install nvim.init
     console.print("Installing neovim config file...", end="")
 
-    nvim_config_path = config_path.joinpath("nvim")
-
     if not config_path.exists():
         os.mkdir(nvim_config_path)
 
     if not nvim_config_path.exists():
         os.mkdir(nvim_config_path)
-
-    nvim_init_path = current_path.joinpath("neovim/init.vim")
 
     shutil.copy(nvim_init_path, nvim_config_path)
 
