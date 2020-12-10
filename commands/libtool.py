@@ -40,8 +40,6 @@ def install():
         for data in response.iter_content(chunk_size=1024):
             archive.write(data)
 
-    print(1)
-
     # extract archive
     libtool_tmp_path = temp_path.joinpath(libtool_archive_top_directory_name)
     if libtool_tmp_path.exists():
@@ -56,8 +54,6 @@ def install():
 
     shutil.move(str(libtool_tmp_path), str(libtool_package_path))
 
-    print(1)
-
     # configure
     args = ["./configure", "--prefix={}".format(libtool_install_path)]
     result = subprocess.run(
@@ -66,8 +62,6 @@ def install():
 
     if result.returncode != 0:
         print(result.stderr)
-
-    print(1)
 
     # make
     args = ["make"]
@@ -78,8 +72,6 @@ def install():
     if result.returncode != 0:
         print(result.stderr)
 
-    print(1)
-
     # make install
     args = ["make", "install"]
     result = subprocess.run(
@@ -88,8 +80,6 @@ def install():
 
     if result.returncode != 0:
         print(result.stderr)
-
-    print(1)
 
     # install bashrc config
     shutil.copy(libtool_bashrc_config_path, bashrc_config_path)

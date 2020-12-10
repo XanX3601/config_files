@@ -15,3 +15,4 @@ from .utils import (
 )
 from .vifm import vifm
 from .libtool import libtool
+from .automake import automake

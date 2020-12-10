@@ -1,0 +1,3 @@
+AUTOMAKE_HOME="$HOME/local/libtool"
+
+export PATH=$AUTOMAKE_HOME/bin:$PATH

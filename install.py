@@ -1,6 +1,6 @@
 import click
 
-from commands import neovim, create_utils_dirs, vifm, libtool
+from commands import neovim, create_utils_dirs, vifm, libtool, automake
 
 
 @click.group()
@@ -13,4 +13,5 @@ if __name__ == "__main__":
     cli.add_command(neovim)
     cli.add_command(vifm)
     cli.add_command(libtool)
+    cli.add_command(automake)
     cli()
