@@ -1,6 +1,13 @@
 import click
 
-from commands import neovim, create_utils_dirs, vifm, libtool, automake, autoconf
+from commands import (
+    neovim,
+    create_utils_dirs,
+    vifm,
+    libtool,
+    automake,
+    autoconf,
+)
 
 
 @click.group()

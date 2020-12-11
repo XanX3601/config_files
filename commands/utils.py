@@ -10,6 +10,7 @@ home_path = pathlib.Path.home()
 repository_path = home_path.joinpath("repo")
 local_path = home_path.joinpath("local")
 config_path = home_path.joinpath(".config")
+configs_path = current_path.joinpath("configs")
 config_bash_path = "$HOME/.config"
 bashrc_path = home_path.joinpath(".bashrc")
 bashrc_config_path = config_path.joinpath("bashrc")

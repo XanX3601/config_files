@@ -12,6 +12,7 @@ from .utils import (
     create_utils_dirs,
     temp_path,
     package_path,
+    configs_path,
 )
 from .vifm import vifm
 from .libtool import libtool

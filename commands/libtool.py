@@ -13,6 +13,7 @@ from .utils import (
     bashrc_config_path,
     bashrc_path,
     console,
+    configs_path,
 )
 
 libtool_archive_link = "https://ftpmirror.gnu.org/libtool/libtool-2.4.6.tar.gz"
@@ -20,7 +21,7 @@ libtool_archive_top_directory_name = "libtool-2.4.6"
 libtool_archive_path = temp_path.joinpath("libtool.tar.gz")
 libtool_package_path = package_path.joinpath("libtool")
 libtool_install_path = local_path.joinpath("libtool")
-libtool_bashrc_config_path = current_path.joinpath("libtool/bash_libtool")
+libtool_bashrc_config_path = configs_path.joinpath("libtool/bash_libtool")
 libtool_bashrc_line = "source {}/{}".format(
     bashrc_config_path, libtool_bashrc_config_path.name
 )

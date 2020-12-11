@@ -9,22 +9,22 @@ from rich.progress import BarColumn, Progress
 from .utils import (
     bashrc_config_path,
     bashrc_path,
-    config_bash_path,
     config_path,
     console,
-    current_path,
     local_path,
     repository_path,
+    configs_path,
 )
 
+nvim_repo_link = "https://github.com/neovim/neovim.git"
 nvim_repo_path = repository_path.joinpath("neovim")
 nvim_install_path = local_path.joinpath("neovim")
 nvim_build_path = nvim_repo_path.joinpath("build")
-nvim_bashrc_config_path = current_path.joinpath("neovim/bash_nvim")
+nvim_bashrc_config_path = configs_path.joinpath("neovim/bash_nvim")
 nvim_bashrc_line = "source {}/{}".format(
     bashrc_config_path, nvim_bashrc_config_path.name
 )
-nvim_init_path = current_path.joinpath("neovim/init.vim")
+nvim_init_path = configs_path.joinpath("neovim/init.vim")
 nvim_config_path = config_path.joinpath("nvim")
 
 
@@ -58,9 +58,7 @@ def install():
                 console.print("{} is not a git repository".format(nvim_repo_path))
                 exit(1)
         else:
-            nvim_repo = git.Repo.clone_from(
-                "https://github.com/neovim/neovim.git", nvim_repo_path
-            )
+            nvim_repo = git.Repo.clone_from(nvim_repo_link, nvim_repo_path)
 
     console.print("Cloning neovim repository...[bold green]Done![/]")
 

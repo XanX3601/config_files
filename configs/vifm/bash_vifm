@@ -1,0 +1,3 @@
+VIFM_HOME="$HOME/local/vifm"
+
+export PATH=$VIFM_HOME/bin:$PATH

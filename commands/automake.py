@@ -13,6 +13,7 @@ from .utils import (
     bashrc_config_path,
     bashrc_path,
     console,
+    configs_path,
 )
 
 automake_archive_link = "https://ftp.gnu.org/gnu/automake/automake-1.16.3.tar.gz"
@@ -20,7 +21,7 @@ automake_archive_top_directory_name = "automake-1.16.3"
 automake_archive_path = temp_path.joinpath("automake.tar.gz")
 automake_package_path = package_path.joinpath("automake")
 automake_install_path = local_path.joinpath("automake")
-automake_bashrc_config_path = current_path.joinpath("automake/bash_automake")
+automake_bashrc_config_path = configs_path.joinpath("automake/bash_automake")
 automake_bashrc_line = "source {}/{}".format(
     bashrc_config_path, automake_bashrc_config_path.name
 )

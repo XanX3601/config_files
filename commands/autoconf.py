@@ -9,10 +9,10 @@ from .utils import (
     temp_path,
     package_path,
     local_path,
-    current_path,
     bashrc_config_path,
     bashrc_path,
     console,
+    configs_path,
 )
 
 autoconf_archive_link = "https://ftp.gnu.org/gnu/autoconf/autoconf-2.70.tar.gz"
@@ -20,7 +20,7 @@ autoconf_archive_top_directory_name = "autoconf-2.70"
 autoconf_archive_path = temp_path.joinpath("autoconf.tar.gz")
 autoconf_package_path = package_path.joinpath("autoconf")
 autoconf_install_path = local_path.joinpath("autoconf")
-autoconf_bashrc_config_path = current_path.joinpath("autoconf/bash_autoconf")
+autoconf_bashrc_config_path = configs_path.joinpath("autoconf/bash_autoconf")
 autoconf_bashrc_line = "source {}/{}".format(
     bashrc_config_path, autoconf_bashrc_config_path.name
 )
