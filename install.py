@@ -7,6 +7,7 @@ from commands import (
     libtool,
     automake,
     autoconf,
+    ncurses,
 )
 
 
@@ -22,4 +23,5 @@ if __name__ == "__main__":
     cli.add_command(libtool)
     cli.add_command(automake)
     cli.add_command(autoconf)
+    cli.add_command(ncurses)
     cli()
