@@ -168,6 +168,78 @@ def install():
 
     console.print("Compiling and installing ncurses...[bold green]Done![/]")
 
+    # configure
+    with Progress(
+        "[progress.dexcription]{task.description}",
+        BarColumn(),
+        console=console,
+        transient=True,
+    ) as progress:
+        progress.add_task("Configuring ncursesw...", start=False)
+
+        args = [
+            "./configure",
+            "--prefix={}".format(ncurses_install_path),
+            "--enable-widec",
+        ]
+        result = subprocess.run(
+            args, cwd=ncurses_package_path, capture_output=True, text=True
+        )
+
+        if result.returncode != 0:
+            console.print(
+                "Error while configuring ncurses", justify="center", style="bold red"
+            )
+            console.rule("stdout")
+            console.print(result.stdout)
+            console.rule("stderr")
+            console.print(result.stderr)
+            exit(1)
+
+    console.print("Configuring ncursesw...[bold green]Done![/]")
+
+    # make
+    with Progress(
+        "[progress.dexcription]{task.description}",
+        BarColumn(),
+        console=console,
+        transient=True,
+    ) as progress:
+        progress.add_task("Compiling and installing ncursesw...", start=False)
+
+        args = ["make"]
+        result = subprocess.run(
+            args, cwd=ncurses_package_path, capture_output=True, text=True
+        )
+
+        if result.returncode != 0:
+            console.print(
+                "Error while compiling ncursesw", justify="center", style="bold red"
+            )
+            console.rule("stdout")
+            console.print(result.stdout)
+            console.rule("stderr")
+            console.print(result.stderr)
+            exit(1)
+
+        # make install
+        args = ["make", "install"]
+        result = subprocess.run(
+            args, cwd=ncurses_package_path, capture_output=True, text=True
+        )
+
+        if result.returncode != 0:
+            console.print(
+                "Error while insalling ncursesw", justify="center", style="bold red"
+            )
+            console.rule("stdout")
+            console.print(result.stdout)
+            console.rule("stderr")
+            console.print(result.stderr)
+            exit(1)
+
+    console.print("Compiling and installing ncursesw...[bold green]Done![/]")
+
     # install bashrc config
     console.print("Installing ncurses bash config...", end="")
 
