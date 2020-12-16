@@ -1,30 +1,16 @@
 import click
-import requests
-import tarfile
-import subprocess
-from rich.progress import Progress, BarColumn, DownloadColumn
-import shutil
 
-from .utils import (
-    temp_path,
-    package_path,
-    local_path,
-    current_path,
-    bashrc_config_path,
-    bashrc_path,
-    console,
-    configs_path,
-)
+from .utils.resources import console, temp_path, packages_path, local_path
+from .utils.files import download_archive, remove, extract_tarfile, move
+from .utils.make import configure, make, make_install
+from .utils.print import print_stdoutputs
 
+automake_name = "automake"
 automake_archive_link = "https://ftp.gnu.org/gnu/automake/automake-1.16.3.tar.gz"
 automake_archive_top_directory_name = "automake-1.16.3"
 automake_archive_path = temp_path.joinpath("automake.tar.gz")
-automake_package_path = package_path.joinpath("automake")
-automake_install_path = local_path.joinpath("automake")
-automake_bashrc_config_path = configs_path.joinpath("automake/bash_automake")
-automake_bashrc_line = "source {}/{}".format(
-    bashrc_config_path, automake_bashrc_config_path.name
-)
+automake_package_path = packages_path.joinpath("automake")
+automake_install_path = local_path
 
 
 @click.group()
@@ -37,153 +23,38 @@ def automake():
 def install():
     """install automake locally."""
     # clone archive
-    with Progress(
-        "[progress.dexcription]{task.description}",
-        BarColumn(),
-        console=console,
-        transient=True,
-    ) as progress:
-        with open(automake_archive_path, "wb") as archive:
-            task = progress.add_task("Downloading automake archive...", start=False)
-
-            response = requests.get(
-                automake_archive_link,
-                stream=True,
-                headers={"Accept-Encoding": ""},
-            )
-            total = int(response.headers.get("Content-Length"))
-
-            progress.update(task_id=task, total=total)
-            progress.start_task(task_id=task)
-
-            for data in response.iter_content(chunk_size=1024):
-                archive.write(data)
-                progress.advance(task_id=task, advance=len(data))
-
-    console.print("Downloading automake archive...[bold green]Done![/]")
+    download_archive(automake_archive_link, automake_archive_path, automake_name)
 
     # extract archive
-    with Progress(
-        "[progress.dexcription]{task.description}",
-        BarColumn(),
-        console=console,
-        transient=True,
-    ) as progress:
-        progress.add_task("Extracting automake archive...", start=False)
+    automake_tmp_path = temp_path.joinpath(automake_archive_top_directory_name)
 
-        automake_tmp_path = temp_path.joinpath(automake_archive_top_directory_name)
-        if automake_tmp_path.exists():
-            console.print("    Erasing {} directory...".format(automake_tmp_path))
-            shutil.rmtree(automake_tmp_path)
+    if automake_tmp_path.exists():
+        remove(automake_tmp_path, "{}".format(automake_tmp_path))
 
-        with tarfile.open(automake_archive_path) as archive:
-            console.print("    Extracting archive...")
-            archive.extractall(temp_path)
-
-    console.print("Extracing automake archive...[bold green]Done![/]")
+    extract_tarfile(automake_archive_path, temp_path, automake_name)
 
     # move temp directory to repo
-    with Progress(
-        "[progress.dexcription]{task.description}",
-        BarColumn(),
-        console=console,
-        transient=True,
-    ) as progress:
-        progress.add_task("Moving archive content to package...", start=False)
+    if automake_package_path.exists():
+        remove(automake_package_path, "{}".format(automake_package_path))
 
-        if automake_package_path.exists():
-            console.print("    Erasing previous package...")
-            shutil.rmtree(automake_package_path)
-
-        console.print("    Moving archive content...")
-        shutil.move(str(automake_tmp_path), str(automake_package_path))
-
-    console.print("Moving archive content to package...[bold green]Done![/]")
+    move(automake_tmp_path, automake_package_path)
 
     # configure
-    with Progress(
-        "[progress.dexcription]{task.description}",
-        BarColumn(),
-        console=console,
-        transient=True,
-    ) as progress:
-        progress.add_task("Configuring automake...", start=False)
-
-        args = ["./configure", "--prefix={}".format(automake_install_path)]
-        result = subprocess.run(
-            args, cwd=automake_package_path, capture_output=True, text=True
-        )
-
-        if result.returncode != 0:
-            console.print(
-                "Error while configuring automake", justify="center", style="bold red"
-            )
-            console.rule("stdout")
-            console.print(result.stdout)
-            console.rule("stderr")
-            console.print(result.stderr)
-            exit(1)
-
-    console.print("Configuring automake...[bold green]Done![/]")
+    returncode, stdout, stderr = configure(automake_package_path, ["--prefix={}".format(automake_install_path)], automake_name)
+    if returncode != 0:
+        print_stdoutputs("[bold red]Error while configuring {}[/]".format(automake_name), stdout, stderr)
+        exit(1)
 
     # make
-    with Progress(
-        "[progress.dexcription]{task.description}",
-        BarColumn(),
-        console=console,
-        transient=True,
-    ) as progress:
-        progress.add_task("Compiling and installing automake...", start=False)
+    returncode, stdout, stderr = make(automake_package_path, [], automake_name)
+    if returncode != 0:
+        print_stdoutputs("[bold red]Error while making {}[/]".format(automake_name), stdout, stderr)
+        exit(1)
 
-        args = ["make"]
-        result = subprocess.run(
-            args, cwd=automake_package_path, capture_output=True, text=True
-        )
+    returncode, stdout, stderr = make_install(automake_package_path, [], automake_name)
+    if returncode != 0:
+        print_stdoutputs("[bold red]Error while installing {}[/]".format(automake_name), stdout, stderr)
+        exit(1)
 
-        if result.returncode != 0:
-            console.print(
-                "Error while compiling automake", justify="center", style="bold red"
-            )
-            console.rule("stdout")
-            console.print(result.stdout)
-            console.rule("stderr")
-            console.print(result.stderr)
-            exit(1)
+    console.print("[bold green]automake has been installed with success[/]")
 
-        # make install
-        args = ["make", "install"]
-        result = subprocess.run(
-            args, cwd=automake_package_path, capture_output=True, text=True
-        )
-
-        if result.returncode != 0:
-            console.print(
-                "Error while insalling automake", justify="center", style="bold red"
-            )
-            console.rule("stdout")
-            console.print(result.stdout)
-            console.rule("stderr")
-            console.print(result.stderr)
-            exit(1)
-
-    console.print("Compiling and installing automake...[bold green]Done![/]")
-
-    # install bashrc config
-    console.print("Installing automake bash config...", end="")
-
-    shutil.copy(automake_bashrc_config_path, bashrc_config_path)
-
-    bash_line_found = False
-
-    with open(bashrc_path, "r") as bashrc:
-        for line in bashrc:
-            line = line.strip()
-            if line == automake_bashrc_line:
-                bash_line_found = True
-
-    if not bash_line_found:
-        with open(bashrc_path, "a") as bashrc:
-            bashrc.write("\n# automake config\n")
-            bashrc.write("{}\n".format(automake_bashrc_line))
-
-    console.print("[bold green]Done![/]")

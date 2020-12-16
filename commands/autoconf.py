@@ -1,29 +1,16 @@
 import click
-import requests
-import tarfile
-import subprocess
-from rich.progress import Progress, BarColumn, DownloadColumn
-import shutil
 
-from .utils import (
-    temp_path,
-    package_path,
-    local_path,
-    bashrc_config_path,
-    bashrc_path,
-    console,
-    configs_path,
-)
+from .utils.resources import console, temp_path, packages_path, local_path
+from .utils.files import download_archive, remove, extract_tarfile, move
+from .utils.make import configure, make, make_install
+from .utils.print import print_stdoutputs
 
+autoconf_name = "autoconf"
 autoconf_archive_link = "https://ftp.gnu.org/gnu/autoconf/autoconf-2.70.tar.gz"
 autoconf_archive_top_directory_name = "autoconf-2.70"
 autoconf_archive_path = temp_path.joinpath("autoconf.tar.gz")
-autoconf_package_path = package_path.joinpath("autoconf")
-autoconf_install_path = local_path.joinpath("autoconf")
-autoconf_bashrc_config_path = configs_path.joinpath("autoconf/bash_autoconf")
-autoconf_bashrc_line = "source {}/{}".format(
-    bashrc_config_path, autoconf_bashrc_config_path.name
-)
+autoconf_package_path = packages_path.joinpath("autoconf")
+autoconf_install_path = local_path
 
 
 @click.group()
@@ -36,153 +23,38 @@ def autoconf():
 def install():
     """install autoconf locally."""
     # clone archive
-    with Progress(
-        "[progress.dexcription]{task.description}",
-        BarColumn(),
-        console=console,
-        transient=True,
-    ) as progress:
-        with open(autoconf_archive_path, "wb") as archive:
-            task = progress.add_task("Downloading autoconf archive...", start=False)
-
-            response = requests.get(
-                autoconf_archive_link,
-                stream=True,
-                headers={"Accept-Encoding": ""},
-            )
-            total = int(response.headers.get("Content-Length"))
-
-            progress.update(task_id=task, total=total)
-            progress.start_task(task_id=task)
-
-            for data in response.iter_content(chunk_size=1024):
-                archive.write(data)
-                progress.advance(task_id=task, advance=len(data))
-
-    console.print("Downloading autoconf archive...[bold green]Done![/]")
+    download_archive(autoconf_archive_link, autoconf_archive_path, autoconf_name)
 
     # extract archive
-    with Progress(
-        "[progress.dexcription]{task.description}",
-        BarColumn(),
-        console=console,
-        transient=True,
-    ) as progress:
-        progress.add_task("Extracting autoconf archive...", start=False)
+    autoconf_tmp_path = temp_path.joinpath(autoconf_archive_top_directory_name)
 
-        autoconf_tmp_path = temp_path.joinpath(autoconf_archive_top_directory_name)
-        if autoconf_tmp_path.exists():
-            console.print("    Erasing {} directory...".format(autoconf_tmp_path))
-            shutil.rmtree(autoconf_tmp_path)
+    if autoconf_tmp_path.exists():
+        remove(autoconf_tmp_path, "{}".format(autoconf_tmp_path))
 
-        with tarfile.open(autoconf_archive_path) as archive:
-            console.print("    Extracting archive...")
-            archive.extractall(temp_path)
-
-    console.print("Extracing autoconf archive...[bold green]Done![/]")
+    extract_tarfile(autoconf_archive_path, temp_path, autoconf_name)
 
     # move temp directory to repo
-    with Progress(
-        "[progress.dexcription]{task.description}",
-        BarColumn(),
-        console=console,
-        transient=True,
-    ) as progress:
-        progress.add_task("Moving archive content to package...", start=False)
+    if autoconf_package_path.exists():
+        remove(autoconf_package_path, "{}".format(autoconf_package_path))
 
-        if autoconf_package_path.exists():
-            console.print("    Erasing previous package...")
-            shutil.rmtree(autoconf_package_path)
-
-        console.print("    Moving archive content...")
-        shutil.move(str(autoconf_tmp_path), str(autoconf_package_path))
-
-    console.print("Moving archive content to package...[bold green]Done![/]")
+    move(autoconf_tmp_path, autoconf_package_path)
 
     # configure
-    with Progress(
-        "[progress.dexcription]{task.description}",
-        BarColumn(),
-        console=console,
-        transient=True,
-    ) as progress:
-        progress.add_task("Configuring autoconf...", start=False)
-
-        args = ["./configure", "--prefix={}".format(autoconf_install_path)]
-        result = subprocess.run(
-            args, cwd=autoconf_package_path, capture_output=True, text=True
-        )
-
-        if result.returncode != 0:
-            console.print(
-                "Error while configuring autoconf", justify="center", style="bold red"
-            )
-            console.rule("stdout")
-            console.print(result.stdout)
-            console.rule("stderr")
-            console.print(result.stderr)
-            exit(1)
-
-    console.print("Configuring autoconf...[bold green]Done![/]")
+    returncode, stdout, stderr = configure(autoconf_package_path, ["--prefix={}".format(autoconf_install_path)], autoconf_name)
+    if returncode != 0:
+        print_stdoutputs("[bold red]Error while configuring {}[/]".format(autoconf_name), stdout, stderr)
+        exit(1)
 
     # make
-    with Progress(
-        "[progress.dexcription]{task.description}",
-        BarColumn(),
-        console=console,
-        transient=True,
-    ) as progress:
-        progress.add_task("Compiling and installing autoconf...", start=False)
+    returncode, stdout, stderr = make(autoconf_package_path, [], autoconf_name)
+    if returncode != 0:
+        print_stdoutputs("[bold red]Error while making {}[/]".format(autoconf_name), stdout, stderr)
+        exit(1)
 
-        args = ["make"]
-        result = subprocess.run(
-            args, cwd=autoconf_package_path, capture_output=True, text=True
-        )
+    returncode, stdout, stderr = make_install(autoconf_package_path, [], autoconf_name)
+    if returncode != 0:
+        print_stdoutputs("[bold red]Error while installing {}[/]".format(autoconf_name), stdout, stderr)
+        exit(1)
 
-        if result.returncode != 0:
-            console.print(
-                "Error while compiling autoconf", justify="center", style="bold red"
-            )
-            console.rule("stdout")
-            console.print(result.stdout)
-            console.rule("stderr")
-            console.print(result.stderr)
-            exit(1)
+    console.print("[bold green]autoconf has been installed with success[/]")
 
-        # make install
-        args = ["make", "install"]
-        result = subprocess.run(
-            args, cwd=autoconf_package_path, capture_output=True, text=True
-        )
-
-        if result.returncode != 0:
-            console.print(
-                "Error while insalling autoconf", justify="center", style="bold red"
-            )
-            console.rule("stdout")
-            console.print(result.stdout)
-            console.rule("stderr")
-            console.print(result.stderr)
-            exit(1)
-
-    console.print("Compiling and installing autoconf...[bold green]Done![/]")
-
-    # install bashrc config
-    console.print("Installing autoconf bash config...", end="")
-
-    shutil.copy(autoconf_bashrc_config_path, bashrc_config_path)
-
-    bash_line_found = False
-
-    with open(bashrc_path, "r") as bashrc:
-        for line in bashrc:
-            line = line.strip()
-            if line == autoconf_bashrc_line:
-                bash_line_found = True
-
-    if not bash_line_found:
-        with open(bashrc_path, "a") as bashrc:
-            bashrc.write("\n# autoconf config\n")
-            bashrc.write("{}\n".format(autoconf_bashrc_line))
-
-    console.print("[bold green]Done![/]")

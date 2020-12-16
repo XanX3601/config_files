@@ -1,3 +1,0 @@
-AUTOCONF_HOME="$HOME/local/autoconf"
-
-export PATH=$AUTOCONF_HOME/bin:$PATH

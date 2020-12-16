@@ -1,3 +1,0 @@
-AUTOMAKE_HOME="$HOME/local/automake"
-
-export PATH=$AUTOMAKE_HOME/bin:$PATH

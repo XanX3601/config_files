@@ -1,30 +1,16 @@
 import click
-import requests
-import tarfile
-import subprocess
-import shutil
-from rich.progress import Progress, BarColumn, DownloadColumn
 
-from .utils import (
-    temp_path,
-    package_path,
-    local_path,
-    current_path,
-    bashrc_config_path,
-    bashrc_path,
-    console,
-    configs_path,
-)
+from .utils.resources import console, temp_path, packages_path, local_path
+from .utils.files import download_archive, remove, extract_tarfile, move
+from .utils.make import configure, make, make_install
+from .utils.print import print_stdoutputs
 
+ncurses_name = "ncurses"
 ncurses_archive_link = "https://invisible-island.net/datafiles/release/ncurses.tar.gz"
 ncurses_archive_top_directory_name = "ncurses-6.2"
 ncurses_archive_path = temp_path.joinpath("ncurses.tar.gz")
-ncurses_package_path = package_path.joinpath("ncurses")
-ncurses_install_path = local_path.joinpath("ncurses")
-ncurses_bashrc_config_path = configs_path.joinpath("ncurses/bash_ncurses")
-ncurses_bashrc_line = "source {}/{}".format(
-    bashrc_config_path, ncurses_bashrc_config_path.name
-)
+ncurses_package_path = packages_path.joinpath("ncurses")
+ncurses_install_path = local_path
 
 
 @click.group()
@@ -37,225 +23,58 @@ def ncurses():
 def install():
     """install ncurses locally."""
     # clone archive
-    with Progress(
-        "[progress.dexcription]{task.description}",
-        BarColumn(),
-        console=console,
-        transient=True,
-    ) as progress:
-        task = progress.add_task("Downloading ncurses archive...", start=False)
-
-        with open(ncurses_archive_path, "wb") as archive:
-            response = requests.get(
-                ncurses_archive_link,
-                stream=True,
-                headers={"Accept-Encoding": ""},
-            )
-            total = int(response.headers.get("Content-Length"))
-
-            progress.update(task_id=task, total=total)
-            progress.start_task(task_id=task)
-
-            for data in response.iter_content(chunk_size=1024):
-                archive.write(data)
-                progress.advance(task_id=task, advance=len(data))
-
-    console.print("Downloading ncurses archive...[bold green]Done![/]")
+    download_archive(ncurses_archive_link, ncurses_archive_path, ncurses_name)
 
     # extract archive
-    with Progress(
-        "[progress.dexcription]{task.description}",
-        BarColumn(),
-        console=console,
-        transient=True,
-    ) as progress:
-        progress.add_task("Extracting ncurses archive...", start=False)
+    ncurses_tmp_path = temp_path.joinpath(ncurses_archive_top_directory_name)
 
-        ncurses_tmp_path = temp_path.joinpath(ncurses_archive_top_directory_name)
-        if ncurses_tmp_path.exists():
-            console.print("    Erasing {} directory...".format(ncurses_tmp_path))
-            shutil.rmtree(ncurses_tmp_path)
+    if ncurses_tmp_path.exists():
+        remove(ncurses_tmp_path, "{}".format(ncurses_tmp_path))
 
-        with tarfile.open(ncurses_archive_path) as archive:
-            console.print("    Extracting archive...")
-            archive.extractall(temp_path)
+    extract_tarfile(ncurses_archive_path, temp_path, ncurses_name)
 
-    console.print("Extracing ncurses archive...[bold green]Done![/]")
+    # move temp directory to repo
+    if ncurses_package_path.exists():
+        remove(ncurses_package_path, "{}".format(ncurses_package_path))
 
-    # move temp directory to package
-    with Progress(
-        "[progress.dexcription]{task.description}",
-        BarColumn(),
-        console=console,
-        transient=True,
-    ) as progress:
-        progress.add_task("Moving archive content to package...", start=False)
-
-        if ncurses_package_path.exists():
-            console.print("    Erasing previous package...")
-            shutil.rmtree(ncurses_package_path)
-
-        console.print("    Moving archive content...")
-        shutil.move(str(ncurses_tmp_path), str(ncurses_package_path))
-
-    console.print("Moving archive content to package...[bold green]Done![/]")
+    move(ncurses_tmp_path, ncurses_package_path, ncurses_name)
 
     # configure
-    with Progress(
-        "[progress.dexcription]{task.description}",
-        BarColumn(),
-        console=console,
-        transient=True,
-    ) as progress:
-        progress.add_task("Configuring ncurses...", start=False)
-
-        args = ["./configure", "--prefix={}".format(ncurses_install_path)]
-        result = subprocess.run(
-            args, cwd=ncurses_package_path, capture_output=True, text=True
-        )
-
-        if result.returncode != 0:
-            console.print(
-                "Error while configuring ncurses", justify="center", style="bold red"
-            )
-            console.rule("stdout")
-            console.print(result.stdout)
-            console.rule("stderr")
-            console.print(result.stderr)
-            exit(1)
-
-    console.print("Configuring ncurses...[bold green]Done![/]")
+    returncode, stdout, stderr = configure(ncurses_package_path, ["--prefix={}".format(ncurses_install_path)], ncurses_name)
+    if returncode != 0:
+        print_stdoutputs("[bold red]Error while configuring {}[/]".format(ncurses_name), stdout, stderr)
+        exit(1)
 
     # make
-    with Progress(
-        "[progress.dexcription]{task.description}",
-        BarColumn(),
-        console=console,
-        transient=True,
-    ) as progress:
-        progress.add_task("Compiling and installing ncurses...", start=False)
+    returncode, stdout, stderr = make(ncurses_package_path, [], ncurses_name)
+    if returncode != 0:
+        print_stdoutputs("[bold red]Error while making {}[/]".format(ncurses_name), stdout, stderr)
+        exit(1)
 
-        args = ["make"]
-        result = subprocess.run(
-            args, cwd=ncurses_package_path, capture_output=True, text=True
-        )
+    returncode, stdout, stderr = make_install(ncurses_package_path, [], ncurses_name)
+    if returncode != 0:
+        print_stdoutputs("[bold red]Error while installing {}[/]".format(ncurses_name), stdout, stderr)
+        exit(1)
 
-        if result.returncode != 0:
-            console.print(
-                "Error while compiling ncurses", justify="center", style="bold red"
-            )
-            console.rule("stdout")
-            console.print(result.stdout)
-            console.rule("stderr")
-            console.print(result.stderr)
-            exit(1)
-
-        # make install
-        args = ["make", "install"]
-        result = subprocess.run(
-            args, cwd=ncurses_package_path, capture_output=True, text=True
-        )
-
-        if result.returncode != 0:
-            console.print(
-                "Error while insalling ncurses", justify="center", style="bold red"
-            )
-            console.rule("stdout")
-            console.print(result.stdout)
-            console.rule("stderr")
-            console.print(result.stderr)
-            exit(1)
-
-    console.print("Compiling and installing ncurses...[bold green]Done![/]")
+    ncursesw_name = "{}w".format(ncurses_name)
 
     # configure
-    with Progress(
-        "[progress.dexcription]{task.description}",
-        BarColumn(),
-        console=console,
-        transient=True,
-    ) as progress:
-        progress.add_task("Configuring ncursesw...", start=False)
-
-        args = [
-            "./configure",
-            "--prefix={}".format(ncurses_install_path),
-            "--enable-widec",
-        ]
-        result = subprocess.run(
-            args, cwd=ncurses_package_path, capture_output=True, text=True
-        )
-
-        if result.returncode != 0:
-            console.print(
-                "Error while configuring ncurses", justify="center", style="bold red"
-            )
-            console.rule("stdout")
-            console.print(result.stdout)
-            console.rule("stderr")
-            console.print(result.stderr)
-            exit(1)
-
-    console.print("Configuring ncursesw...[bold green]Done![/]")
+    returncode, stdout, stderr = configure(ncurses_package_path, ["--prefix={}".format(ncurses_install_path), "--enable-widec"], ncursesw_name)
+    if returncode != 0:
+        print_stdoutputs("[bold red]Error while configuring {}[/]".format(ncursesw_name), stdout, stderr)
+        exit(1)
 
     # make
-    with Progress(
-        "[progress.dexcription]{task.description}",
-        BarColumn(),
-        console=console,
-        transient=True,
-    ) as progress:
-        progress.add_task("Compiling and installing ncursesw...", start=False)
+    returncode, stdout, stderr = make(ncurses_package_path, [], ncursesw_name)
+    if returncode != 0:
+        print_stdoutputs("[bold red]Error while making {}[/]".format(ncursesw_name), stdout, stderr)
+        exit(1)
 
-        args = ["make"]
-        result = subprocess.run(
-            args, cwd=ncurses_package_path, capture_output=True, text=True
-        )
+    returncode, stdout, stderr = make_install(ncurses_package_path, [], ncursesw_name)
+    if returncode != 0:
+        print_stdoutputs("[bold red]Error while installing {}[/]".format(ncursesw_name), stdout, stderr)
+        exit(1)
 
-        if result.returncode != 0:
-            console.print(
-                "Error while compiling ncursesw", justify="center", style="bold red"
-            )
-            console.rule("stdout")
-            console.print(result.stdout)
-            console.rule("stderr")
-            console.print(result.stderr)
-            exit(1)
 
-        # make install
-        args = ["make", "install"]
-        result = subprocess.run(
-            args, cwd=ncurses_package_path, capture_output=True, text=True
-        )
+    console.print("[bold green]ncurses has been installed with success[/]")
 
-        if result.returncode != 0:
-            console.print(
-                "Error while insalling ncursesw", justify="center", style="bold red"
-            )
-            console.rule("stdout")
-            console.print(result.stdout)
-            console.rule("stderr")
-            console.print(result.stderr)
-            exit(1)
-
-    console.print("Compiling and installing ncursesw...[bold green]Done![/]")
-
-    # install bashrc config
-    console.print("Installing ncurses bash config...", end="")
-
-    shutil.copy(ncurses_bashrc_config_path, bashrc_config_path)
-
-    bash_line_found = False
-
-    with open(bashrc_path, "r") as bashrc:
-        for line in bashrc:
-            line = line.strip()
-            if line == ncurses_bashrc_line:
-                bash_line_found = True
-
-    if not bash_line_found:
-        with open(bashrc_path, "a") as bashrc:
-            bashrc.write("\n# ncurses config\n")
-            bashrc.write("{}\n".format(ncurses_bashrc_line))
-
-    console.print("[bold green]Done![/]")
