@@ -132,7 +132,7 @@ set statusline+=\ %p%% " seen percentage of the file
 set statusline+=\ [%n] " buffer number
 
 "Key bindings
-let mapleader="," " map leader to comma
+let mapleader=";" " map leader to comma
 " open split
 nnoremap <leader>v :vsplit<CR>
 nnoremap <leader>h :split<CR>
@@ -162,7 +162,7 @@ nnoremap <leader>fl :Lines<CR>
 nnoremap <leader>fbl :BLines<CR>
 nnoremap <leader>fs :Snippets<CR>
 " Goyo
-nnoremap <leader>G :Goyo<CR> " toggle Goyo
+nnoremap <leader>g :Goyo<CR> " toggle Goyo
 " Coc
 " Use tab for trigger completion with characters ahead and navigate
 inoremap <silent><expr> <TAB>

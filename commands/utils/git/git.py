@@ -1,11 +1,12 @@
 """Wrapper for git actions."""
 
-from ..resources import console, default_transient_progress
-
 import git
+
+from ..files import LocationDoesNotExist, LocationExists
+from ..resources import console, default_transient_progress
 from .CloneProgress import CloneProgress
 from .NotAGitRepo import NotAGitRepo
-from ..files import LocationExists, LocationDoesNotExist
+
 
 def clone_repository(repo_link, repo_path, repo_name=""):
     """Clone a repository in the repository directory.
@@ -22,18 +23,23 @@ def clone_repository(repo_link, repo_path, repo_name=""):
         LocationExists: if ``repo_path`` already exists.
     """
 
-    if repo_name != "" and not repo_name.endswith(' '):
-        repo_name = '{} '.format(repo_name)
+    if repo_name != "" and not repo_name.endswith(" "):
+        repo_name = "{} ".format(repo_name)
 
     with default_transient_progress() as progress:
-        task_id = progress.add_task("Cloning {}repository...".format(repo_name), start=False)
+        task_id = progress.add_task(
+            "Cloning {}repository...".format(repo_name), start=False
+        )
 
         if repo_path.exists():
             raise LocationExists("{} already exists".format(repo_path))
-        
-        git.Repo.clone_from(repo_link, repo_path, progress=CloneProgress(progress, task_id))
+
+        git.Repo.clone_from(
+            repo_link, repo_path, progress=CloneProgress(progress, task_id)
+        )
 
     console.print("Cloning {}repository...[bold green]Done![/]".format(repo_name))
+
 
 def update_repository(repo_path, repo_name=""):
     """Update the given repository.
@@ -56,7 +62,7 @@ def update_repository(repo_path, repo_name=""):
 
         if not repo_path.exists():
             raise LocationDoesNotExist("{} does not exist".format(repo_path))
-        
+
         try:
             repo = git.Repo(repo_path)
         except:
@@ -66,6 +72,7 @@ def update_repository(repo_path, repo_name=""):
         origin.pull()
 
     console.print("Updating {}repository...[bold green]Done![/]".format(repo_name))
+
 
 def remove_local_changes(repo_path, repo_name=""):
     """Remove all local changes in a repository.

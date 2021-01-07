@@ -1,5 +1,6 @@
 from ..resources import console
 
+
 def print_stdoutputs(title, stdout, stderr):
     """Print the outputs of a subprocess with a title in a rich console.
 
@@ -13,6 +14,7 @@ def print_stdoutputs(title, stdout, stderr):
     console.print(stdout)
     console.rule("stderr")
     console.print(stderr)
+
 
 def print_msg_titled(title, msg):
     """Print a message with a title

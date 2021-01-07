@@ -1,6 +1,8 @@
 import subprocess
+
 from ..files import LocationDoesNotExist, NotADirectory
 from ..resources import console, default_transient_progress
+
 
 def make(dir_path, args, app_name=""):
     """Invoke make in the given directory.
@@ -39,6 +41,7 @@ def make(dir_path, args, app_name=""):
         console.print("Making{}...[bold green]Done![/]".format(app_name))
 
     return result.returncode, result.stdout, result.stderr
+
 
 def make_install(dir_path, args, app_name=""):
     """Invoke make install in the given directory.

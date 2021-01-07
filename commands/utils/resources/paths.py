@@ -31,4 +31,3 @@ resources_dir_paths = [
     config_path,
 ]
 """list: list of directories used in the installation scripts."""
-

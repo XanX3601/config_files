@@ -1,11 +1,13 @@
 import click
 
-from .utils.resources import console, temp_path, packages_path, local_path
-from .utils.files import download_archive, remove, extract_tarfile, move
+from .utils.files import download_archive, extract_tarfile, move, remove
 from .utils.make import configure, make, make_install
-from .utils.print import print_stdoutputs
+from .utils.print import print_msg_titled, print_stdoutputs
+from .utils.resources import console, local_path, packages_path, temp_path
 
 autoconf_name = "autoconf"
+autoconf_version = "2.70"
+autoconf_homepage = "https://www.gnu.org/software/autoconf/"
 autoconf_archive_link = "https://ftp.gnu.org/gnu/autoconf/autoconf-2.70.tar.gz"
 autoconf_archive_top_directory_name = "autoconf-2.70"
 autoconf_archive_path = temp_path.joinpath("autoconf.tar.gz")
@@ -17,6 +19,15 @@ autoconf_install_path = local_path
 def autoconf():
     """autoconf commands group."""
     pass
+
+
+@autoconf.command()
+def info():
+    """print info on autoconf."""
+    print_msg_titled(
+        "{} - {}".format(autoconf_name, autoconf_version),
+        "home page: {}".format(autoconf_homepage),
+    )
 
 
 @autoconf.command()
@@ -40,21 +51,34 @@ def install():
     move(autoconf_tmp_path, autoconf_package_path)
 
     # configure
-    returncode, stdout, stderr = configure(autoconf_package_path, ["--prefix={}".format(autoconf_install_path)], autoconf_name)
+    returncode, stdout, stderr = configure(
+        autoconf_package_path,
+        ["--prefix={}".format(autoconf_install_path)],
+        autoconf_name,
+    )
     if returncode != 0:
-        print_stdoutputs("[bold red]Error while configuring {}[/]".format(autoconf_name), stdout, stderr)
+        print_stdoutputs(
+            "[bold red]Error while configuring {}[/]".format(autoconf_name),
+            stdout,
+            stderr,
+        )
         exit(1)
 
     # make
     returncode, stdout, stderr = make(autoconf_package_path, [], autoconf_name)
     if returncode != 0:
-        print_stdoutputs("[bold red]Error while making {}[/]".format(autoconf_name), stdout, stderr)
+        print_stdoutputs(
+            "[bold red]Error while making {}[/]".format(autoconf_name), stdout, stderr
+        )
         exit(1)
 
     returncode, stdout, stderr = make_install(autoconf_package_path, [], autoconf_name)
     if returncode != 0:
-        print_stdoutputs("[bold red]Error while installing {}[/]".format(autoconf_name), stdout, stderr)
+        print_stdoutputs(
+            "[bold red]Error while installing {}[/]".format(autoconf_name),
+            stdout,
+            stderr,
+        )
         exit(1)
 
     console.print("[bold green]autoconf has been installed with success[/]")
-
