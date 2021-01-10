@@ -104,7 +104,7 @@ def extract_tarfile(tarfile_path, tarfile_target, tarfile_name=""):
     console.print("Extracting {}tarfile...[bold green]Done![/]".format(tarfile_name))
 
 
-def move(source, target, force=False, source_name=""):
+def move(source, target, source_name="", force=False):
     """Move source to target.
 
     Args:

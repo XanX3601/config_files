@@ -44,6 +44,6 @@ def install():
     extract_tarfile(node_archive_path, temp_path, node_name)
 
     # move temp directory to install path
-    move(node_tmp_path, node_install_path, True, node_name)
+    move(node_tmp_path, node_install_path, node_name, True)
 
     console.print("[bold green]{} has been installed with success[/]".format(node_name))

@@ -5,6 +5,8 @@ from .utils.make import configure, make, make_install
 from .utils.print import print_msg_titled, print_stdoutputs
 from .utils.resources import console, local_path, packages_path, temp_path
 
+from .autoconf import install as autoconf_install
+
 automake_name = "automake"
 automake_version = "1.16.3"
 automake_homepage = "https://www.gnu.org/software/automake/"
@@ -31,8 +33,14 @@ def info():
 
 
 @automake.command()
-def install():
+@click.option('--with-dependencies', is_flag=True, help="Install with dependencies")
+@click.pass_context
+def install(ctx, with_dependencies):
     """install automake locally."""
+    # handle dependencies
+    if with_dependencies:
+        ctx.invoke(autoconf_install)
+
     # clone archive
     download_archive(automake_archive_link, automake_archive_path, automake_name)
 

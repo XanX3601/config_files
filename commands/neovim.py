@@ -8,6 +8,9 @@ from .utils.print import print_msg_titled, print_stdoutputs
 from .utils.resources import (config_path, configs_path, console, local_path,
                               repositories_path)
 
+from .automake import install as automake_install
+from .libtool import install as libtool_install
+
 nvim_name = "neovim"
 nvim_homepage = "https://neovim.io/"
 nvim_repo_link = "https://github.com/neovim/neovim.git"
@@ -35,8 +38,15 @@ def info():
 
 
 @neovim.command()
-def install():
+@click.option('--with-dependencies', is_flag=True, help="Install with dependencies")
+@click.pass_context
+def install(ctx, with_dependencies):
     """install neovim locally."""
+    # handle dependencies
+    if with_dependencies:
+        ctx.invoke(automake_install, with_dependencies=with_dependencies)
+        ctx.invoke(libtool_install)
+
     # clone repository
     try:
         clone_repository(nvim_repo_link, nvim_repo_path, nvim_name)

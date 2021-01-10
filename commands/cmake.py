@@ -5,6 +5,8 @@ from .utils.make import bootstrap, make, make_install
 from .utils.print import print_msg_titled, print_stdoutputs
 from .utils.resources import console, local_path, packages_path, temp_path
 
+from .openssl import install as openssl_install
+
 cmake_name = "cmake"
 cmake_version = "3.19.2"
 cmake_homepage = "https://cmake.org/"
@@ -33,8 +35,14 @@ def info():
 
 
 @cmake.command()
-def install():
+@click.option('--with-dependencies', is_flag=True, help="Install with dependencies")
+@click.pass_context
+def install(ctx, with_dependencies):
     """install cmake locally."""
+    # handle dependencies
+    if with_dependencies:
+        ctx.invoke(openssl_install)
+
     # clone archive
     download_archive(cmake_archive_link, cmake_archive_path, cmake_name)
 

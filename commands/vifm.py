@@ -7,6 +7,7 @@ from .utils.make import autoreconf, configure, make, make_install
 from .utils.print import print_msg_titled, print_stdoutputs
 from .utils.resources import (config_path, configs_path, console, local_path,
                               repositories_path)
+from .ncurses import install as ncurses_install
 
 vifm_name = "vifm"
 vifm_homepage = "https://vifm.info/"
@@ -33,8 +34,14 @@ def info():
 
 
 @vifm.command()
-def install():
+@click.option('--with-dependencies', is_flag=True, help="Install with dependencies")
+@click.pass_context
+def install(ctx, with_dependencies):
     """install vifm locally."""
+    # handle dependencies
+    if with_dependencies:
+        ctx.invoke(ncurses_install)
+
     # clone repository
     try:
         clone_repository(vifm_repo_link, vifm_repo_path, vifm_name)
@@ -65,6 +72,7 @@ def install():
             stdout,
             stderr,
         )
+        exit(1)
 
     # configure
     returncode, stdout, stderr = configure(
@@ -79,6 +87,7 @@ def install():
         print_stdoutputs(
             "[bold red]Error while configuring {}[/]".format(vifm_name), stdout, stderr
         )
+        exit(1)
 
     # make
     returncode, stdout, stderr = make(
@@ -88,6 +97,7 @@ def install():
         print_stdoutputs(
             "[bold red]Error while compiling {}[/]".format(vifm_name), stdout, stderr
         )
+        exit(1)
 
     # make install
     returncode, stdout, stderr = make_install(vifm_repo_path, [], vifm_name)
@@ -95,6 +105,7 @@ def install():
         print_stdoutputs(
             "[bold red]Error while installing {}[/]".format(vifm_name), stdout, stderr
         )
+        exit(1)
 
     # install vifm.init
     if not vifm_config_path.exists():
