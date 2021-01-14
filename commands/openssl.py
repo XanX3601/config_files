@@ -1,12 +1,22 @@
 import click
 
 from .utils.files import LocationExists, copy, create_directory
-from .utils.git import (NotAGitRepo, clone_repository, remove_local_changes,
-                        update_repository)
+from .utils.git import (
+    NotAGitRepo,
+    clone_repository,
+    remove_local_changes,
+    update_repository,
+)
 from .utils.make import Configure, make, make_install
 from .utils.print import print_msg_titled, print_stdoutputs
-from .utils.resources import (config_path, configs_path, console, home_path,
-                              local_path, repositories_path)
+from .utils.resources import (
+    config_path,
+    configs_path,
+    console,
+    home_path,
+    local_path,
+    repositories_path,
+)
 
 openssl_name = "openssl"
 openssl_homepage = "https://www.openssl.org/"

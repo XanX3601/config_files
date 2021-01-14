@@ -1,7 +1,19 @@
 import click
 
-from commands import (autoconf, automake, bash, cmake, libtool, llvm, ncurses,
-                      neovim, node, openssl, vifm)
+from commands import (
+    autoconf,
+    automake,
+    bash,
+    cmake,
+    libtool,
+    llvm,
+    ncurses,
+    neovim,
+    node,
+    openssl,
+    vifm,
+    ninja,
+)
 from commands.utils.files import create_resources_dirs
 
 
@@ -23,4 +35,5 @@ if __name__ == "__main__":
     cli.add_command(cmake)
     cli.add_command(openssl)
     cli.add_command(llvm)
+    cli.add_command(ninja)
     cli()

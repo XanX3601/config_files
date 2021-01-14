@@ -34,9 +34,6 @@ require'nvim-treesitter.configs'.setup {
     highlight = {
         enable = true,
     },
-    indent = {
-        enable = true,
-    },
 }
 EOF
 " vim-codefmt
@@ -90,8 +87,6 @@ set shiftwidth=4
 set tabstop=4
 set softtabstop=4
 set expandtab
-set autoindent " enable indentation
-set smartindent " indentation made smarter (works better for C like language)
 " prevent inserting comments on new lines
 autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
 set hls " highlight all matches from previous search pattern

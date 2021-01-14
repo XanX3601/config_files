@@ -112,3 +112,7 @@ fi
 
 # export .local directory in path
 export PATH="$HOME/.local/bin:$PATH"
+
+# export ninja directory in path
+NINJA_HOME="$HOME/Repositories/ninja"
+export PATH="$NINJA_HOME/build-cmake:$PATH"
