@@ -44,6 +44,8 @@ def install():
     extract_tarfile(llvm_archive_path, temp_path, llvm_name)
 
     # move temp directory to install path
-    move(llvm_tmp_path, llvm_install_path, llvm_name)
+    target = llvm_install_path
+    source = llvm_tmp_path
+    move(source, target, llvm_name, True)
 
     console.print("[bold green]{} has been installed with success[/]".format(llvm_name))

@@ -1,12 +1,21 @@
 import click
 
 from .utils.files import LocationExists, copy, create_directory
-from .utils.git import (NotAGitRepo, clone_repository, remove_local_changes,
-                        update_repository)
+from .utils.git import (
+    NotAGitRepo,
+    clone_repository,
+    remove_local_changes,
+    update_repository,
+)
 from .utils.make import autoreconf, configure, make, make_install
 from .utils.print import print_msg_titled, print_stdoutputs
-from .utils.resources import (config_path, configs_path, console, local_path,
-                              repositories_path)
+from .utils.resources import (
+    config_path,
+    configs_path,
+    console,
+    local_path,
+    repositories_path,
+)
 from .ncurses import install as ncurses_install
 
 vifm_name = "vifm"
@@ -34,7 +43,7 @@ def info():
 
 
 @vifm.command()
-@click.option('--with-dependencies', is_flag=True, help="Install with dependencies")
+@click.option("--with-dependencies", is_flag=True, help="Install with dependencies")
 @click.pass_context
 def install(ctx, with_dependencies):
     """install vifm locally."""

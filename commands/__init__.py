@@ -9,3 +9,4 @@ from .neovim import neovim
 from .nodejs import node
 from .openssl import openssl
 from .vifm import vifm
+from .ninja import ninja

@@ -7,8 +7,7 @@ import tarfile
 
 import requests
 
-from ..resources import (console, default_transient_progress,
-                         resources_dir_paths)
+from ..resources import console, default_transient_progress, resources_dir_paths
 
 
 def create_directory(dir_path):

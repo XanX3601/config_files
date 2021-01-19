@@ -33,7 +33,7 @@ def info():
 
 
 @automake.command()
-@click.option('--with-dependencies', is_flag=True, help="Install with dependencies")
+@click.option("--with-dependencies", is_flag=True, help="Install with dependencies")
 @click.pass_context
 def install(ctx, with_dependencies):
     """install automake locally."""

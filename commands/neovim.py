@@ -5,8 +5,13 @@ from .utils.files import LocationExists, copy, create_directory, download_file
 from .utils.git import NotAGitRepo, clone_repository, update_repository
 from .utils.make import make, make_install
 from .utils.print import print_msg_titled, print_stdoutputs
-from .utils.resources import (config_path, configs_path, console, local_path,
-                              repositories_path)
+from .utils.resources import (
+    config_path,
+    configs_path,
+    console,
+    local_path,
+    repositories_path,
+)
 
 from .automake import install as automake_install
 from .libtool import install as libtool_install
@@ -38,7 +43,7 @@ def info():
 
 
 @neovim.command()
-@click.option('--with-dependencies', is_flag=True, help="Install with dependencies")
+@click.option("--with-dependencies", is_flag=True, help="Install with dependencies")
 @click.pass_context
 def install(ctx, with_dependencies):
     """install neovim locally."""
@@ -118,20 +123,5 @@ def install(ctx, with_dependencies):
             "[bold red]Error while installing neovim plugin[/]", stdout, stderr
         )
         exit(1)
-
-    # installing coc plugins
-    # not currently working
-    """
-    if not is_callable("node"):
-        print_msg_titled("[bold red]Error installing coc extensions[/]", "node is not callable. Please install it and then retry.")
-        exit(1)
-
-    args = ["nvim", "+\"CocInstall coc-pyright\"", "+qall"]
-    returncode, stdout, stderr = call_command(args, "CocInstall")
-
-    if returncode != 0:
-        print_stdoutputs("[bold red]Error while installing coc nvim plugins[/]", stdout, stderr)
-        exit(1)
-    """
 
     console.print("[bold green]{} has been installed with success[/]".format(nvim_name))
